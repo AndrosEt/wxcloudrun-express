@@ -66,7 +66,7 @@ app.get("/api/item", async (req, response) => {
     });
 });
 
-app.get("/api/test", async (req, response) => {
+app.get("/api/testlist", async (req, response) => {
     let data = '';
     https.get('https://m.cnbeta.com.tw/touch/default/timeline.json', (res) => {
 
