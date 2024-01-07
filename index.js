@@ -89,6 +89,28 @@ app.get("/api/testlist", async (req, response) => {
     });
 });
 
+app.get("/api/testlist", async (req, response) => {
+    console.log("handling the test")
+    let data = '';
+    https.get('https://m.cnbeta.com.tw/touch/default/timeline.json', (res) => {
+
+        // 当接收到数据时，将其添加到 data 变量中
+        res.on('data', (chunk) => {
+            data += chunk;
+        });
+
+        // 当请求结束时，打印响应的数据
+        res.on('end', () => {
+            response.send({
+                data
+            });
+        });
+
+    }).on("error", (err) => {
+        console.log("Error: " + err.message);
+    });
+});
+
 // 小程序调用，获取微信 Open ID
 app.get("/api/wx_openid", async (req, res) => {
     if (req.headers["x-wx-source"]) {
