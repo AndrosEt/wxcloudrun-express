@@ -72,6 +72,7 @@ app.get("/api/testlist", async (req, response) => {
 
         // 当接收到数据时，将其添加到 data 变量中
         res.on('data', (chunk) => {
+            console.log(chunk)
             data += chunk;
         });
 
