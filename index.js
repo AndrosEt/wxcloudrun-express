@@ -2,60 +2,84 @@ const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
-const { init: initDB, Counter } = require("./db");
+// const { init: initDB, Counter } = require("./db");
+const https = require('https');
+const url = require('url');
+
 
 const logger = morgan("tiny");
 
 const app = express();
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 app.use(express.json());
 app.use(cors());
 app.use(logger);
 
 // 首页
 app.get("/", async (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+    res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// 更新计数
-app.post("/api/count", async (req, res) => {
-  const { action } = req.body;
-  if (action === "inc") {
-    await Counter.create();
-  } else if (action === "clear") {
-    await Counter.destroy({
-      truncate: true,
+app.get("/api/list", async (req, response) => {
+    let data = '';
+    https.get('https://new-cnbeta.schrodingersclub.workers.dev/touch/default/timeline.json', (res) => {
+
+        // 当接收到数据时，将其添加到 data 变量中
+        res.on('data', (chunk) => {
+            data += chunk;
+        });
+
+        // 当请求结束时，打印响应的数据
+        res.on('end', () => {
+            let jsonData = JSON.parse(data);
+            console.log(jsonData);
+            response.send({
+                jsonData
+            });
+        });
+
+    }).on("error", (err) => {
+        console.log("Error: " + err.message);
     });
-  }
-  res.send({
-    code: 0,
-    data: await Counter.count(),
-  });
 });
 
-// 获取计数
-app.get("/api/count", async (req, res) => {
-  const result = await Counter.count();
-  res.send({
-    code: 0,
-    data: result,
-  });
+app.get("/api/item", async (req, response) => {
+    let urlObj = url.parse(req.url, true);
+    let query = urlObj.query;
+    let data = '';
+    https.get('https://new-cnbeta.schrodingersclub.workers.dev/touch/articles/' + query.id + '.htm', (res) => {
+
+        // 当接收到数据时，将其添加到 data 变量中
+        res.on('data', (chunk) => {
+            data += chunk;
+        });
+
+        // 当请求结束时，打印响应的数据
+        res.on('end', () => {
+            response.send({
+                data
+            });
+        });
+
+    }).on("error", (err) => {
+        console.log("Error: " + err.message);
+    });
 });
 
 // 小程序调用，获取微信 Open ID
 app.get("/api/wx_openid", async (req, res) => {
-  if (req.headers["x-wx-source"]) {
-    res.send(req.headers["x-wx-openid"]);
-  }
+    if (req.headers["x-wx-source"]) {
+        res.send(req.headers["x-wx-openid"]);
+    }
 });
 
 const port = process.env.PORT || 80;
 
 async function bootstrap() {
-  await initDB();
-  app.listen(port, () => {
-    console.log("启动成功", port);
-  });
+    // await initDB();
+    app.listen(port, () => {
+        console.log("启动成功", port);
+    });
 }
 
 bootstrap();
