@@ -98,7 +98,10 @@ app.get("/api/test-superagent", async (req, response) => {
     let query = urlObj.query;
     superagent
         .get(query.url)
-        .set('accept', 'json')
+        .set('Accept', 'application/json')
+        .set('Accept-Encoding', 'gzip, deflate, br')
+        .set('content-type', 'content-type')
+        .set('User-Agent', 'PostmanRuntime/7.29.0')
         .end((err, res) => {
             // Calling the end function will send the request
             console.log(`error: ${err}`)
