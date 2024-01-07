@@ -67,8 +67,9 @@ app.get("/api/item", async (req, response) => {
 });
 
 app.get("/api/testlist", async (req, response) => {
+    console.log("handle the test...")
     let data = '';
-    https.get('https://m.cnbeta.com.tw/touch/default/timeline.json', (res) => {
+    https.get('https://baidu.com', (res) => {
 
         // 当接收到数据时，将其添加到 data 变量中
         res.on('data', (chunk) => {
