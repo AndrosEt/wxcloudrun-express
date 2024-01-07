@@ -5,7 +5,7 @@ const morgan = require("morgan");
 // const { init: initDB, Counter } = require("./db");
 const https = require('https');
 const url = require('url');
-
+const superagent = require('superagent');
 
 const logger = morgan("tiny");
 
@@ -68,8 +68,10 @@ app.get("/api/item", async (req, response) => {
 
 app.get("/api/testlist", async (req, response) => {
     console.log("handle the test...")
+    let urlObj = url.parse(req.url, true);
+    let query = urlObj.query;
     let data = '';
-    https.get('https://baidu.com', (res) => {
+    https.get(query.url, (res) => {
 
         // 当接收到数据时，将其添加到 data 变量中
         res.on('data', (chunk) => {
@@ -88,6 +90,25 @@ app.get("/api/testlist", async (req, response) => {
         console.log("Error: " + err.message);
     });
 });
+
+
+app.get("/api/test-superagent", async (req, response) => {
+    console.log("handle the superagent test...")
+    let urlObj = url.parse(req.url, true);
+    let query = urlObj.query;
+    superagent
+        .get(query.url)
+        .set('accept', 'json')
+        .end((err, res) => {
+            // Calling the end function will send the request
+            console.log(`error: ${err}`)
+            response.send({
+                res
+            });
+        })
+
+});
+
 
 app.get("/api/testlist", async (req, response) => {
     console.log("handling the test")
