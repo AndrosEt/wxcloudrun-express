@@ -66,6 +66,27 @@ app.get("/api/item", async (req, response) => {
     });
 });
 
+app.get("/api/test", async (req, response) => {
+    let data = '';
+    https.get('https://api.ip.sb/geoip', (res) => {
+
+        // 当接收到数据时，将其添加到 data 变量中
+        res.on('data', (chunk) => {
+            data += chunk;
+        });
+
+        // 当请求结束时，打印响应的数据
+        res.on('end', () => {
+            response.send({
+                data
+            });
+        });
+
+    }).on("error", (err) => {
+        console.log("Error: " + err.message);
+    });
+});
+
 // 小程序调用，获取微信 Open ID
 app.get("/api/wx_openid", async (req, res) => {
     if (req.headers["x-wx-source"]) {
